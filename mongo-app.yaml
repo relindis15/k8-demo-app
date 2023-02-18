@@ -3,8 +3,9 @@ kind: Deployment
 metadata:
   name: mongo-deployment
   labels:
-     app: mongo
+    app: mongo
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mongo
@@ -22,28 +23,28 @@ spec:
             cpu: "0.5m"
         ports:
         - containerPort: 27017
-    env:
-        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
             secretKeyRef:
               name: mongo-secret
               key: mongo-user
-        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+        - name: MONGO_INITDB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: mongo-secret
-              key: mongo-password 
-              
-...
+              key: mongo-password
+
+---
 
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo-service
 spec:
-  type: ClusterIP
   selector:
     app: mongo
   ports:
-  - port: 27017
-    targetPort: 27017
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
